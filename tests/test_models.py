@@ -4,6 +4,30 @@ import numpy as np
 import pytest
 import numpy.testing as npt
 
+@pytest.mark.parametrize(
+    "test, expected, expect_raises",
+    [
+        ([[0, 0, 0], [0, 0, 0], [0, 0, 0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]], None),
+        ([[1, 1, 1], [1, 1, 1], [1, 1, 1]], [[1, 1, 1], [1, 1, 1], [1, 1, 1]], None),
+        ([[float("nan"), 1, 1], [1, 1, 1], [1, 1, 1]], [[0, 0, 0], [1, 1, 1], [1, 1, 1]], None),
+        ([[1, 1, 1], [1, -1, 1], [1, 1, 1]], [[1, 1, 1], [1, 0, 1], [1, 1, 1]], None),
+        ([[1, 2, 3,], [4, 5, 6], [7, 8, 9]], [[0.33, 0.67, 1], [0.67, 0.83, 1], [0.78, 0.89, 1]], None),
+        ([[1, 2, 3,], [4, 5, float("nan")], [7, 8, 9]], None, ValueError),
+        ("Hello", None, TypeError)
+    ]
+)
+def test_patient_normalise(test, expected, expect_raises):
+    """Test normalisation works for arrays of one and positive integers.
+    Assumption that tests accuracy of 2dp is sufficient"""
+    from inflammation.models import patient_normalise
+    if isinstance(test, list):
+        test = np.array(test)
+    if expect_raises == none:
+        npt.assert_almost_equal(patient_normalise(test), np.array(expected), decimal=2)
+    else:
+        with pytest.raises(expect_raises):
+            npt.assert_almost_equal(patient_normalise(np.array(test)), np.array(expected), decimal=2)
+
 
 def test_daily_mean_zeros():
     """Test that mean function works for an array of zeros."""
